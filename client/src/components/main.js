@@ -4,7 +4,7 @@ import { TextField, Button } from "@material-ui/core";
 import { Send } from "@material-ui/icons";
 import Chat from "./chat";
 
-function Main({pdfText}) {
+function Main({ pdfText }) {
   const [message, setMessage] = useState("");
 
   const [chat, setChat] = useState([
@@ -18,34 +18,40 @@ function Main({pdfText}) {
     setMessage(msg);
   };
 
-  
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    if (message !== '') {
-      axios
-        .post("http://localhost:3080/", {
+  
+    if (message !== "") {
+      setChat((prevChat) => [
+        ...prevChat,
+        {
+          role: "user",
+          content: message,
+        },
+      ]);
+  
+      try {
+        const response = await axios.post("http://localhost:3080/", {
           message: message,
           systemMessage: pdfText,
-        })
-        .then((response) => {
-          setChat([
-            ...chat,
-            {
-              role: "user",
-              content: message,
-            },
+        });
+  
+        const assistantMessage = response.data.data.choices[0].message.content;
+  
+        setTimeout(() => {
+          setChat((prevChat) => [
+            ...prevChat,
             {
               role: "assistant",
-              content: response.data.data.choices[0].message.content,
+              content: assistantMessage,
             },
           ]);
+        }, 500); // Adjust the delay time as needed
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
   
-          setMessage("");
-          console.log(response.data.data.choices[0].message);
-        })
-        .catch((error) => {
-          console.error("An error occurred:", error);
-        });
+      setMessage("");
     }
   };
   
