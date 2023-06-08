@@ -8,7 +8,7 @@ function App() {
   return (
     <div className="flex w-[100vw]">
       <Sidebar setPdfText={setPdfText} pdfText={pdfText}/>
-      <Main pdfText={pdfText} />
+      <Main pdfText={pdfText}  />
     </div>
   );
 }
